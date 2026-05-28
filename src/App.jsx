@@ -2137,6 +2137,7 @@ export default function DailyQuestionApp() {
     if (!user) return;
     const interval = setInterval(async () => {
       const store = getSharedStore();
+      const other = user === "Akash" ? "Anumaa" : "Akash";
       const [aDoc, jDoc, mDoc] = await Promise.all([
         fsGet("answers"),
         fsGet("journal"),
@@ -2145,7 +2146,8 @@ export default function DailyQuestionApp() {
       if (aDoc) {
         store.dailyAnswers = aDoc;
         const fresh = aDoc[answersKey(qMood)] || { Akash: "", Anumaa: "" };
-        setAnswers({ ...fresh });
+        // Only update the partner's answer — never overwrite what the current user is typing
+        setAnswers(prev => ({ ...fresh, [user]: prev[user] }));
       }
       if (jDoc && jDoc.entries) {
         store.journal = jDoc.entries;
